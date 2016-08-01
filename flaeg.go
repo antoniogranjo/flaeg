@@ -438,16 +438,16 @@ func LoadWithCommand(cmd *Command, cmdArgs []string, customParsers map[reflect.T
 	}
 
 	valmap, errParseArgs := parseArgs(cmdArgs, tagsmap, parsers)
-	if errParseArgs != nil {
-		if errParseArgs == ErrParserNotFound {
-			fmt.Println(errParseArgs.Error())
-		} else {
-			return PrintErrorWithCommand(errParseArgs, tagsmap, defaultValmap, parsers, cmd, subCommand)
-		}
+	if errParseArgs != nil && errParseArgs != ErrParserNotFound {
+		return PrintErrorWithCommand(errParseArgs, tagsmap, defaultValmap, parsers, cmd, subCommand)
 	}
 
 	if err := fillStructRecursive(reflect.ValueOf(cmd.Config), defaultValmap, valmap, ""); err != nil {
 		return err
+	}
+
+	if errParseArgs == ErrParserNotFound {
+		return errParseArgs
 	}
 
 	return nil

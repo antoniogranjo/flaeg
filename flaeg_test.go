@@ -1625,24 +1625,18 @@ func TestLoadInitConfigAllDefaultSomeFlagErrorParser(t *testing.T) {
 
 	// catch stdout
 	rescueStdout := os.Stdout
-	r, w, _ := os.Pipe()
+	_, w, _ := os.Pipe()
 	os.Stdout = w
 
 	//TEST
 	err := Load(config, defaultPointers, args)
-	if err != nil {
-		t.Errorf("Error %s", err.Error())
+	if err != ErrParserNotFound {
+		t.Errorf("Expexted error %s\ngot %s", ErrParserNotFound, err)
 	}
 
 	// read and restore stdout
 	w.Close()
-	out, _ := ioutil.ReadAll(r)
 	os.Stdout = rescueStdout
-
-	//check
-	if !strings.Contains(string(out), ErrParserNotFound.Error()) {
-		t.Errorf("Expexted error %s\ngot %s", ErrParserNotFound.Error(), out)
-	}
 
 	//check contunue on error
 	check := newConfiguration()
@@ -2254,7 +2248,6 @@ Complete documentation is available at https://github.com/containous/flaeg`,
 	if !strings.Contains(string(out), "flaegtest is a test program made to test flaeg library") {
 		t.Fatalf("Expexted root command help")
 	}
-	fmt.Print(string(out))
 }
 
 //Test Commands feature with root and version commands
